@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       app: mysql
+      # this app: label must match that in the mysql service yaml.
   strategy:
     type: Recreate # terminates all the pods and replaces them with the new version.
   template: 
