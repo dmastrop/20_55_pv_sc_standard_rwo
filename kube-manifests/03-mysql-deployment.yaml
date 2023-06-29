@@ -26,6 +26,8 @@ spec:
           env:
             - name: MYSQL_ROOT_PASSWORD
               value: dbpassword11
+              # this password will be used in the usermgmtwebapp yaml as one of the ENV variables
+              # The usermgmtwebapp will then be able to establish a connection to the mysql db.
           ports:
             - containerPort: 3306
               name: mysql    
@@ -38,16 +40,18 @@ spec:
             - name: usermanagement-dbcreation-script
               mountPath: /docker-entrypoint-initdb.d #https://hub.docker.com/_/mysql Refer Initializing a fresh instance  
               # see the notes below  
-              # the script specified in the ConfigMap yaml will be counted at this /docker-entrypoint-initdb.d folder
+              # the script specified in the ConfigMap yaml will be mounted at this /docker-entrypoint-initdb.d folder
               # see the notes below on this special folder. This folder is for bootup script execution for first time bootup of container
+              # it will initialize the database properly.
                                         
       volumes: 
       #these are pod level volumes
       # this link has example https://kubernetes.io/docs/concepts/storage/volumes/
         - name: mysql-persistent-storage
-        # volume name
+        # persistent volume name
           persistentVolumeClaim:
             claimName: mysql-pv-claim
+            # persitent volume claim name (not the PV name)
             # this is the name used in the persitent-volume-claim.yaml file
         - name: usermanagement-dbcreation-script
         # this is the name in the ConfigMap.yaml
@@ -62,6 +66,9 @@ spec:
 ## Only they can be mounted in Container
 ## 4. Using Compute Enginer Persistent Disk CSI Driver is a super generalized approach 
 ## for having Persistent Volumes for workloads in Kubernetes
+# furthermore the PV exists outside of the default namespace and is not bound to any particular pod
+# as such it is persistent through container crashes, etc.  The pod is bound to the persistent volume via the persistent volume claim
+# in this respect, claim to a portion of the volume is dynamic.
 
 
 ## ENVIRONMENT VARIABLES
